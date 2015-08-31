@@ -19,6 +19,10 @@ task createTag {
     doLast {
         logger.quiet "Creating tag '$tagName'."
 
+        // Remove potentially existing tag
+        repo.tag.remove(names: [tagName])
+
+        // Create tag
         repo.tag.add {
             name = tagName
             message = "Version ${project.version}"
@@ -34,7 +38,7 @@ task pushTag {
         logger.quiet "Pushing tag '$createTag.tagName' to remote."
 
         repo.push {
-            tags = true
+            refsOrSpecs = [createTag.tagName]
         }
     }
 }

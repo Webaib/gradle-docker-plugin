@@ -16,15 +16,11 @@
 package com.bmuschko.gradle.docker.tasks.image
 
 import com.bmuschko.gradle.docker.DockerRegistryCredentials
-import com.bmuschko.gradle.docker.response.ResponseHandler
-import com.bmuschko.gradle.docker.response.image.BuildImageResponseHandler
 import com.bmuschko.gradle.docker.tasks.AbstractDockerRemoteApiTask
 import com.bmuschko.gradle.docker.tasks.RegistryCredentialsAware
 import org.gradle.api.tasks.*
 
 class DockerBuildImage extends AbstractDockerRemoteApiTask implements RegistryCredentialsAware {
-    private ResponseHandler<String, InputStream> responseHandler = new BuildImageResponseHandler()
-
     /**
      * Input directory containing the build context. Defaults to "$projectDir/docker".
      */
@@ -117,11 +113,8 @@ class DockerBuildImage extends AbstractDockerRemoteApiTask implements RegistryCr
             buildImageCmd.withBuildAuthConfigs(authConfigurations)
         }
 
-        InputStream response = buildImageCmd.exec()
-        imageId = responseHandler.handle(response)
-    }
-
-    void setResponseHandler(ResponseHandler<String, InputStream> responseHandler) {
-        this.responseHandler = responseHandler
+        def response = buildImageCmd.exec(threadContextClassLoader.createBuildImageResultCallback())
+        imageId = response.awaitImageId()
+        logger.quiet "Created image with ID '$imageId'."
     }
 }

@@ -16,6 +16,7 @@
 package com.bmuschko.gradle.docker.tasks.container
 
 import com.bmuschko.gradle.docker.tasks.AbstractDockerRemoteApiTask
+import com.bmuschko.gradle.docker.utils.CollectionUtil
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Optional
 
@@ -217,8 +218,8 @@ class DockerCreateContainer extends AbstractDockerRemoteApiTask {
         }
 
         if (getLinks()) {
-            def createdLinks = getLinks().collect( { threadContextClassLoader.createLink(it) })
-            containerCommand.withHostConfig(threadContextClassLoader.createHostConfig(["links":createdLinks]))
+            def createdLinks = getLinks().collect { threadContextClassLoader.createLink(it) }
+            containerCommand.withLinks(CollectionUtil.toArray(createdLinks))
         }
 
         if(getVolumesFrom()) {
