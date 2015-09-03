@@ -31,6 +31,10 @@ class DockerListImages extends AbstractDockerRemoteApiTask {
     @Input
     @Optional
     String filters
+	
+	@Input
+	@Optional
+	String list
 
     @Override
     void runRemoteCommand(dockerClient) {
@@ -46,6 +50,7 @@ class DockerListImages extends AbstractDockerRemoteApiTask {
 
         def images = listImagesCmd.exec()
         responseHandler.handle(images)
+		setList(images.get(0).id)
     }
 
     void setResponseHandler(ResponseHandler<Void, List<Object>> responseHandler) {

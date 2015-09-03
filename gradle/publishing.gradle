@@ -24,7 +24,7 @@ publishing {
                 root.appendNode('name', 'Gradle Docker plugin')
                 root.appendNode('description', 'Gradle plugin for managing Docker images and containers.')
                 root.appendNode('url', 'https://github.com/bmuschko/gradle-docker-plugin')
-                root.appendNode('inceptionYear', '2014')
+                root.appendNode('inceptionYear', '2015')
 
                 def scm = root.appendNode('scm')
                 scm.appendNode('url', 'https://github.com/bmuschko/gradle-docker-plugin')
