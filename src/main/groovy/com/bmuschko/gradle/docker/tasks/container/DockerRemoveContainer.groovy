@@ -19,6 +19,11 @@ class DockerRemoveContainer extends DockerExistingContainer {
     @Override
     void runRemoteCommand(dockerClient) {
         logger.quiet "Removing container with ID '${getContainerId()}'."
-        dockerClient.removeContainerCmd(getContainerId()).exec()
+		
+		try {
+			dockerClient.removeContainerCmd(getContainerId()).exec()
+		} catch (Exception e) {
+			logger.quiet "Removing container with ID '${e.getMessage()}' failed."
+		}
     }
 }
