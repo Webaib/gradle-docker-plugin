@@ -8,7 +8,7 @@ final class TestConfiguration {
     private TestConfiguration() {}
 
     static String getDockerServerUrl() {
-        System.properties[DOCKER_SERVER_URL_SYS_PROP] ?: 'http://localhost:2375'
+        System.properties[DOCKER_SERVER_URL_SYS_PROP] ?: 'https://localhost:2376'
     }
 
     static File getDockerCertPath() {

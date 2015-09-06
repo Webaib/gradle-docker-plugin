@@ -34,6 +34,10 @@ class DockerListImages extends AbstractDockerRemoteApiTask {
 	
 	@Input
 	@Optional
+	Map grep
+	
+	@Input
+	@Optional
 	List images
 
     @Override
@@ -48,7 +52,15 @@ class DockerListImages extends AbstractDockerRemoteApiTask {
             listImagesCmd.withFilters(getFilters())
         }
 
-        images = listImagesCmd.exec()
+		if (grep) {
+			listImagesCmd.exec().each {
+            	def allValid = grep{key, value -> it.key ==~ value}.collect{a, b -> a && b}
+				if (allValid)
+					images << it 
+			}
+		} else {
+        	images = listImagesCmd.exec()
+		}
         responseHandler.handle(images)
     }
 
