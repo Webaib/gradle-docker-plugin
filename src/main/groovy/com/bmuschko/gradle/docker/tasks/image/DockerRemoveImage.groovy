@@ -16,14 +16,9 @@
 package com.bmuschko.gradle.docker.tasks.image
 
 class DockerRemoveImage extends DockerExistingImage {
-	@Override
-	void runRemoteCommand(dockerClient) {
-		logger.quiet "Removing image with ID '${getImageId()}'."
-
-		try {
-			dockerClient.removeImageCmd(getImageId()).exec()
-		} catch (Exception e) {
-			logger.quiet "Removing image with ID '${e.getMessage()}' failed."
-		}
-	}
+    @Override
+    void runRemoteCommand(dockerClient) {
+        logger.quiet "Removing image with ID '${getImageId()}'."
+        dockerClient.removeImageCmd(getImageId()).exec()
+    }
 }
