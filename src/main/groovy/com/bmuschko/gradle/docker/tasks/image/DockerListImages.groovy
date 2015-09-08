@@ -22,49 +22,55 @@ import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Optional
 
 class DockerListImages extends AbstractDockerRemoteApiTask {
-    private ResponseHandler<Void, List<Object>> responseHandler = new ListImagesResponseHandler()
+	private ResponseHandler<Void, List<Object>> responseHandler = new ListImagesResponseHandler()
 
-    @Input
-    @Optional
-    Boolean showAll
-
-    @Input
-    @Optional
-    String filters
-	
 	@Input
 	@Optional
-	Map grep
-	
+	Boolean showAll
+
 	@Input
 	@Optional
+	String filters
+
 	List images
 
-    @Override
-    void runRemoteCommand(dockerClient) {
-        def listImagesCmd = dockerClient.listImagesCmd()
+	@Optional
+	greps
 
-        if(getShowAll()) {
-            listImagesCmd.withShowAll(getShowAll())
-        }
+	@Override
+	void runRemoteCommand(dockerClient) {
+		def listImagesCmd = dockerClient.listImagesCmd()
 
-        if(getFilters()) {
-            listImagesCmd.withFilters(getFilters())
-        }
-
-		if (grep) {
-			listImagesCmd.exec().each {
-            	def allValid = grep{key, value -> it.key ==~ value}.collect{a, b -> a && b}
-				if (allValid)
-					images << it 
-			}
-		} else {
-        	images = listImagesCmd.exec()
+		if(getShowAll()) {
+			listImagesCmd.withShowAll(getShowAll())
 		}
-        responseHandler.handle(images)
-    }
 
-    void setResponseHandler(ResponseHandler<Void, List<Object>> responseHandler) {
-        this.responseHandler = responseHandler
-    }
+		if(getFilters()) {
+			listImagesCmd.withFilters(getFilters())
+		}
+
+		List allImages = listImagesCmd.exec()
+		
+		println greps
+
+		images = greps ? allImages.findAll {
+			image ->
+			greps.any {
+				grep ->
+				grep.collect {
+					k, v ->
+					image.hasProperty(k) &&
+						(image.("$k").getClass().isArray() ? image.("$k").any {it ==~ v} : image.("$k")  ==~ v)
+				}.every {
+					it == true
+				}
+			}
+		} : allImages
+
+		responseHandler.handle(images)
+	}
+
+	void setResponseHandler(ResponseHandler<Void, List<Object>> responseHandler) {
+		this.responseHandler = responseHandler
+	}
 }
