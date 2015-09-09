@@ -24,7 +24,5 @@ class ListImagesResponseHandler implements ResponseHandler<String, List> {
             logger.quiet "Virtual Size    : $image.virtualSize"
             logger.quiet "-----------------------------------------------"
         }
-		
-		return "brrr"
     }
 }
