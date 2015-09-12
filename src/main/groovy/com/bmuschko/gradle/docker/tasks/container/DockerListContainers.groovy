@@ -27,6 +27,19 @@ class DockerListContainers extends AbstractDockerRemoteApiTask {
 	@Input
 	@Optional
 	Boolean showAll
+	
+	@Input
+	@Optional
+	Integer limit
+	
+	@Input
+	@Optional
+	String since
+	
+	@Input
+	@Optional
+	String before
+	
 
 	@Input
 	@Optional
@@ -39,20 +52,30 @@ class DockerListContainers extends AbstractDockerRemoteApiTask {
 
 	@Override
 	void runRemoteCommand(dockerClient) {
-		def listImagesCmd = dockerClient.listImagesCmd()
+		def listContainersCmd = dockerClient.listContainersCmd()
 
 		if(getShowAll()) {
-			listImagesCmd.withShowAll(getShowAll())
+			listContainersCmd.withShowAll(getShowAll())
+		}
+		
+		if(getLimit()) {
+			listContainersCmd.withLimit(getLimit())
+		}
+		
+		if(getSince()) {
+			listContainersCmd.withSince(getSince())
+		}
+		
+		if(getBefore()) {
+			listContainersCmd.withBefore(getBefore())
 		}
 
 		if(getFilters()) {
-			listImagesCmd.withFilters(getFilters())
+			listContainersCmd.withFilters(getFilters())
 		}
-
-		List allImages = listImagesCmd.exec()
 		
-		println greps
-
+		List allContainers = listContainersCmd.exec()
+		
 		images = greps ? allImages.findAll {
 			image ->
 			greps.any {
