@@ -51,8 +51,6 @@ class DockerListImages extends AbstractDockerRemoteApiTask {
 
 		List allImages = listImagesCmd.exec()
 		
-		println greps
-
 		images = greps ? allImages.findAll {
 			image ->
 			greps.any {
