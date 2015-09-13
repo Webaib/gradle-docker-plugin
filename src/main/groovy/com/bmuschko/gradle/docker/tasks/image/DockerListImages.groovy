@@ -22,53 +22,53 @@ import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Optional
 
 class DockerListImages extends AbstractDockerRemoteApiTask {
-	private ResponseHandler<Void, List<Object>> responseHandler = new ListImagesResponseHandler()
+    private ResponseHandler<Void, List<Object>> responseHandler = new ListImagesResponseHandler()
 
-	@Input
-	@Optional
-	Boolean showAll
+    @Input
+    @Optional
+    Boolean showAll
 
-	@Input
-	@Optional
-	String filters
+    @Input
+    @Optional
+    String filters
 
-	List images
+    List images
 
-	@Optional
-	greps
+    @Optional
+    greps
 
-	@Override
-	void runRemoteCommand(dockerClient) {
-		def listImagesCmd = dockerClient.listImagesCmd()
+    @Override
+    void runRemoteCommand(dockerClient) {
+        def listImagesCmd = dockerClient.listImagesCmd()
 
-		if(getShowAll()) {
-			listImagesCmd.withShowAll(getShowAll())
-		}
+        if(getShowAll()) {
+            listImagesCmd.withShowAll(getShowAll())
+        }
 
-		if(getFilters()) {
-			listImagesCmd.withFilters(getFilters())
-		}
+        if(getFilters()) {
+            listImagesCmd.withFilters(getFilters())
+        }
 
-		List allImages = listImagesCmd.exec()
-		
-		images = greps ? allImages.findAll {
-			image ->
-			greps.any {
-				grep ->
-				grep.collect {
-					k, v ->
-					image.hasProperty(k) &&
-						(image.("$k").getClass().isArray() ? image.("$k").any {it ==~ v} : image.("$k")  ==~ v)
-				}.every {
-					it == true
-				}
-			}
-		} : allImages
+        List allImages = listImagesCmd.exec()
+        
+        images = greps ? allImages.findAll {
+            image ->
+            greps.any {
+                grep ->
+                grep.collect {
+                    k, v ->
+                    image.hasProperty(k) &&
+                        (image.("$k").getClass().isArray() ? image.("$k").any {it ==~ v} : image.("$k")  ==~ v)
+                }.every {
+                    it == true
+                }
+            }
+        } : allImages
 
-		responseHandler.handle(images)
-	}
+        responseHandler.handle(images)
+    }
 
-	void setResponseHandler(ResponseHandler<Void, List<Object>> responseHandler) {
-		this.responseHandler = responseHandler
-	}
+    void setResponseHandler(ResponseHandler<Void, List<Object>> responseHandler) {
+        this.responseHandler = responseHandler
+    }
 }

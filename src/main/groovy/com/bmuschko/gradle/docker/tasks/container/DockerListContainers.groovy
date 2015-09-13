@@ -15,85 +15,81 @@
  */
 package com.bmuschko.gradle.docker.tasks.container
 
-import com.bmuschko.gradle.docker.response.ResponseHandler
-import com.bmuschko.gradle.docker.response.image.ListImagesResponseHandler
-import com.bmuschko.gradle.docker.tasks.AbstractDockerRemoteApiTask
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Optional
 
+import com.bmuschko.gradle.docker.response.ResponseHandler
+import com.bmuschko.gradle.docker.response.container.ListContainersResponseHandler
+import com.bmuschko.gradle.docker.tasks.AbstractDockerRemoteApiTask
+
 class DockerListContainers extends AbstractDockerRemoteApiTask {
-	private ResponseHandler<Void, List<Object>> responseHandler = new ListImagesResponseHandler()
+    private ResponseHandler<Void, List<Object>> responseHandler = new ListContainersResponseHandler()
 
-	@Input
-	@Optional
-	Boolean showAll
-	
-	@Input
-	@Optional
-	Integer limit
-	
-	@Input
-	@Optional
-	String since
-	
-	@Input
-	@Optional
-	String before
-	
+    @Input
+    @Optional
+    Boolean showAll
 
-	@Input
-	@Optional
-	String filters
+    @Input
+    @Optional
+    Integer limit
 
-	List containers
+    @Input
+    @Optional
+    String since
 
-	@Optional
-	greps
+    @Input
+    @Optional
+    String before
 
-	@Override
-	void runRemoteCommand(dockerClient) {
-		def listContainersCmd = dockerClient.listContainersCmd()
 
-		if(getShowAll()) {
-			listContainersCmd.withShowAll(getShowAll())
-		}
-		
-		if(getLimit()) {
-			listContainersCmd.withLimit(getLimit())
-		}
-		
-		if(getSince()) {
-			listContainersCmd.withSince(getSince())
-		}
-		
-		if(getBefore()) {
-			listContainersCmd.withBefore(getBefore())
-		}
+    @Input
+    @Optional
+    String filters
 
-		if(getFilters()) {
-			listContainersCmd.withFilters(getFilters())
-		}
-		
-		List allContainers = listContainersCmd.exec()
-		
-		images = greps ? allImages.findAll {
-			image ->
-			greps.any {
-				grep ->
-				grep.collect {
-					k, v ->
-					image.hasProperty(k) &&
-						(image.("$k").getClass().isArray() ? image.("$k").any {it ==~ v} : image.("$k")  ==~ v)
-				}.every {
-					it == true
-				}
-			}
-		} : allImages
+    List containers
 
-		responseHandler.handle(images)
-	}
+    @Optional
+    greps
 
-	void setResponseHandler(ResponseHandler<Void, List<Object>> responseHandler) {
-		this.responseHandler = responseHandler
-	}
+    @Override
+    void runRemoteCommand(dockerClient) {
+        def listContainersCmd = dockerClient.listContainersCmd()
+
+        if(getShowAll()) {
+            listContainersCmd.withShowAll(getShowAll())
+        }
+
+        if(getLimit()) {
+            listContainersCmd.withLimit(getLimit())
+        }
+
+        if(getSince()) {
+            listContainersCmd.withSince(getSince())
+        }
+
+        if(getBefore()) {
+            listContainersCmd.withBefore(getBefore())
+        }
+
+        if(getFilters()) {
+            listContainersCmd.withFilters(getFilters())
+        }
+
+        List allContainers = listContainersCmd.exec()
+
+        containers = greps ? allContainers.findAll { image ->
+            greps.any { grep ->
+                grep.collect { k, v ->
+                    image.hasProperty(k) &&
+                            (image.("$k").getClass().isArray() ? image.("$k").any {it ==~ v} : image.("$k")  ==~ v)
+                }.every { it == true }
+            }
+        } : allContainers
+
+        responseHandler.handle(containers)
+    }
+
+    void setResponseHandler(ResponseHandler<Void, List<Object>> responseHandler) {
+        this.responseHandler = responseHandler
+    }
 }
