@@ -14,6 +14,8 @@ apply plugin: com.jfrog.bintray.gradle.BintrayPlugin
 publishing {
     publications {
         mavenJava(MavenPublication) {
+			groupId 'net.overscale'
+			
             from components.java
             artifact sourcesJar
             artifact groovydocJar
@@ -27,9 +29,9 @@ publishing {
                 root.appendNode('inceptionYear', '2015')
 
                 def scm = root.appendNode('scm')
-                scm.appendNode('url', 'https://github.com/bmuschko/gradle-docker-plugin')
-                scm.appendNode('connection', 'scm:https://bmuschko@github.com/bmuschko/gradle-docker-plugin.git')
-                scm.appendNode('developerConnection', 'scm:git://github.com/bmuschko/gradle-docker-plugin.git')
+                scm.appendNode('url', 'https://github.com/Webaib/gradle-docker-plugin')
+                scm.appendNode('connection', 'scm:https://webaib@github.com/Webaib/gradle-docker-plugin.git')
+                scm.appendNode('developerConnection', 'scm:git://github.com/Webaib/gradle-docker-plugin.git')
 
                 def license = root.appendNode('licenses').appendNode('license')
                 license.appendNode('name', 'The Apache Software License, Version 2.0')
@@ -38,12 +40,24 @@ publishing {
 
                 def developers = root.appendNode('developers')
                 def bmuschko = developers.appendNode('developer')
-                bmuschko.appendNode('id', 'bmuschko')
-                bmuschko.appendNode('name', 'Benjamin Muschko')
-                bmuschko.appendNode('email', 'benjamin.muschko@gmail.com')
+                bmuschko.appendNode('id', 'Webaib')
+                bmuschko.appendNode('name', 'Juri Pavlov')
+                bmuschko.appendNode('email', 'webaib@gmail.com')
             }
         }
     }
+	
+	repositories {
+		maven() {
+			name = "mySnapshot"
+			credentials {
+				username = "admin"
+				password = resolveProperty('ARTIFACTORY_PAS', 'artifactoryPas')
+			}
+			url "http://10.0.3.166:9080/artifactory/plugins-snapshot-local/"
+		}
+		
+	}
 }
 
 bintray {
@@ -77,6 +91,7 @@ bintray {
 
 String resolveProperty(String envVarKey, String projectPropKey) {
     String propValue = System.getenv()[envVarKey]
+	
 
     if(propValue) {
         return propValue

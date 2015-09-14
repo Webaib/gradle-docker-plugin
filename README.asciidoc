@@ -204,7 +204,7 @@ task buildImage(type: DockerBuildImage) {
 
 ==== List images with(-out) filters and grep 
 
-This version of plugin return from a task DockerListImages a list of images. So you can access this list per 'taskList.images'
+Return from a task DockerListImages a list of images. So you can access this list per 'taskList.images'
 Any image has following properties: "created", "parentId", "repoTags", "id", "virtualSize", "size". All of them are strings 
 except "repoTags" - array of strings. You can extra select images per 'greps', which is array of maps.
 A filter is from Docker Java API and it works only for labeled images.
@@ -221,7 +221,7 @@ task listImagesA(type: DockerListImages) {
 	
 	doLast {
 		//DockerListImages task return List<Image>
-		println listImages.images.each {println it.id}
+		listImages.images.each {println it}
 	}
 }
 
@@ -229,11 +229,37 @@ task listImagesB(type: DockerListImages) {
 	filters='{"label": ["myLabel=bestImageEver"]}'
 
 	doLast {
-		println listImages.images.each {println it.id}
+		listImages.images.each {println it}
 	}
 }
 	
 ----
+
+==== List containers with(-out) filters and grep 
+
+Return from a task DockerListContainers a list of containers. So you can access this list per 'taskList.images'
+Any container has following properties: "created", "status", "labels", "id", "command", "ports", "names", "image".
+All of them are strings except "repoTags" - array of strings. You can extra select images per 'greps', which is 
+array of maps. A filter is from Docker Java API and it works only for labeled images.
+
+[source,groovy]
+----
+apply plugin: 'com.bmuschko.docker-remote-api'
+
+import com.bmuschko.gradle.docker.tasks.container.*
+
+task listContainers(type: DockerListContainers) {
+	//you can use a regex in the value of the map
+	greps = [['names':'sonarqube.*']]
+	
+	doLast {
+		//DockerListContainers task return List<Container>
+		listContainers.containers.each {println it}
+	}
+}
+	
+----
+
 
 ==== Executing functional tests against a running container
 
