@@ -15,15 +15,32 @@
  */
 package com.bmuschko.gradle.docker.tasks.container
 
+import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.Optional
+
 class DockerRemoveContainer extends DockerExistingContainer {
-    @Override
-    void runRemoteCommand(dockerClient) {
-        logger.quiet "Removing container with ID '${getContainerId()}'."
-		
-		try {
-			dockerClient.removeContainerCmd(getContainerId()).exec()
-		} catch (Exception e) {
-			logger.quiet "Removing container with ID '${e.getMessage()}' failed."
+
+	@Input
+	@Optional
+	Boolean force
+
+	@Input
+	@Optional
+	Boolean removeVolumes
+
+	@Override
+	void runRemoteCommand(dockerClient) {
+		def removeContainerCmd = dockerClient.removeContainerCmd()
+
+		if(getForce()) {
+			removeContainerCmd.withForce(getForce())
 		}
-    }
+
+		if(getRemoveVolumes()) {
+			removeContainerCmd.withRemoveVolumes(getRemoveVolumes())
+		}
+
+		logger.quiet "Removing container with ID '${getContainerId()}'."
+		removeContainerCmd(getContainerId()).exec()
+	}
 }
