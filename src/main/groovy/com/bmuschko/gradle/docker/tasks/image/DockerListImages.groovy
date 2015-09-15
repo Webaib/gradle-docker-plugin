@@ -34,6 +34,7 @@ class DockerListImages extends AbstractDockerRemoteApiTask {
 
     List images
 
+	@Input
     @Optional
     greps
 
@@ -51,14 +52,13 @@ class DockerListImages extends AbstractDockerRemoteApiTask {
 
         List allImages = listImagesCmd.exec()
         
-        images = greps ? allImages.findAll {
-            image ->
-            greps.any {
-                grep ->
-                grep.collect {
-                    k, v ->
-                    image.hasProperty(k) &&
-                        (image.("$k").getClass().isArray() ? image.("$k").any {it ==~ v} : image.("$k")  ==~ v)
+        images = greps && !showAll ? allImages.findAll {
+            image -> greps.any {
+                grep -> grep.collect {
+                    k, v -> image.hasProperty(k) &&
+                        (image.("$k").getClass().isArray() ? 
+							image.("$k").any {it ==~ v} : 
+							image.("$k")  ==~ v)
                 }.every {
                     it == true
                 }

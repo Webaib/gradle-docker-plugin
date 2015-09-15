@@ -202,7 +202,7 @@ task buildImage(type: DockerBuildImage) {
 }
 ----
 
-==== List images with(-out) filters and grep 
+==== List images 
 
 Return from a task DockerListImages a list of images. So you can access this list per 'taskList.images'
 Any image has following properties: "created", "parentId", "repoTags", "id", "virtualSize", "size". All of them are strings 
@@ -235,7 +235,8 @@ task listImagesB(type: DockerListImages) {
 	
 ----
 
-==== List containers with(-out) filters and grep 
+
+==== List containers 
 
 Return from a task DockerListContainers a list of containers. So you can access this list per 'taskList.images'
 Any container has following properties: "created", "status", "labels", "id", "command", "ports", "names", "image".

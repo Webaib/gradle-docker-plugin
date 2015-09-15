@@ -30,7 +30,7 @@ class DockerRemoveContainer extends DockerExistingContainer {
 
 	@Override
 	void runRemoteCommand(dockerClient) {
-		def removeContainerCmd = dockerClient.removeContainerCmd()
+		def removeContainerCmd = dockerClient.removeContainerCmd(getContainerId())
 
 		if(getForce()) {
 			removeContainerCmd.withForce(getForce())
@@ -41,6 +41,6 @@ class DockerRemoveContainer extends DockerExistingContainer {
 		}
 
 		logger.quiet "Removing container with ID '${getContainerId()}'."
-		removeContainerCmd(getContainerId()).exec()
+		removeContainerCmd.exec()
 	}
 }
