@@ -22,53 +22,61 @@ import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Optional
 
 class DockerListImages extends AbstractDockerRemoteApiTask {
-    private ResponseHandler<Void, List<Object>> responseHandler = new ListImagesResponseHandler()
-
-    @Input
-    @Optional
-    Boolean showAll
-
-    @Input
-    @Optional
-    String filters
-
-    List images
+	private ResponseHandler<Void, List<Object>> responseHandler = new ListImagesResponseHandler()
 
 	@Input
-    @Optional
-    greps
+	@Optional
+	Boolean showAll
 
-    @Override
-    void runRemoteCommand(dockerClient) {
-        def listImagesCmd = dockerClient.listImagesCmd()
+	@Input
+	@Optional
+	String filters
 
-        if(getShowAll()) {
-            listImagesCmd.withShowAll(getShowAll())
-        }
+	List images
 
-        if(getFilters()) {
-            listImagesCmd.withFilters(getFilters())
-        }
+	@Input
+	@Optional
+	greps
 
-        List allImages = listImagesCmd.exec()
-        
-        images = greps && !showAll ? allImages.findAll {
-            image -> greps.any {
-                grep -> grep.collect {
-                    k, v -> image.hasProperty(k) &&
-                        (image.("$k").getClass().isArray() ? 
-							image.("$k").any {it ==~ v} : 
+	String imageId
+
+	DockerListImages() {
+		ext.getImageId = {
+			imageId
+		}
+	}
+
+	@Override
+	void runRemoteCommand(dockerClient) {
+		def listImagesCmd = dockerClient.listImagesCmd()
+
+		if(getShowAll()) {
+			listImagesCmd.withShowAll(getShowAll())
+		}
+
+		if(getFilters()) {
+			listImagesCmd.withFilters(getFilters())
+		}
+
+		List allImages = listImagesCmd.exec()
+
+		images = greps && !showAll ? allImages.findAll { image ->
+			greps.any { grep ->
+				grep.collect { k, v ->
+					image.hasProperty(k) &&
+						(image.("$k").getClass().isArray() ?
+							image.("$k").any {it ==~ v} :
 							image.("$k")  ==~ v)
-                }.every {
-                    it == true
-                }
-            }
-        } : allImages
+				}.every { it == true }
+			}
+		} : allImages
+	
+		imageId = images?.find {true}?.id
 
-        responseHandler.handle(images)
-    }
+		responseHandler.handle(images)
+	}
 
-    void setResponseHandler(ResponseHandler<Void, List<Object>> responseHandler) {
-        this.responseHandler = responseHandler
-    }
+	void setResponseHandler(ResponseHandler<Void, List<Object>> responseHandler) {
+		this.responseHandler = responseHandler
+	}
 }

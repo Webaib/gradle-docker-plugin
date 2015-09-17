@@ -27,7 +27,7 @@ class DockerRemoveImage extends DockerExistingImage {
 	@Input
 	@Optional
 	Boolean noPrune
-	
+		
     @Override
     void runRemoteCommand(dockerClient) {
 		logger.quiet "Removing image with ID '${getImageId()}'."
