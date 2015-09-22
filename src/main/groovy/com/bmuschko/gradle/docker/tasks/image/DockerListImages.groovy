@@ -33,16 +33,16 @@ class DockerListImages extends AbstractDockerRemoteApiTask {
 	String filters
 
 	List images
+	
+	List imagesId
 
 	@Input
 	@Optional
 	greps
 
-	String imageId
-
 	DockerListImages() {
-		ext.getImageId = {
-			imageId
+		ext.getImagesId = {
+			imagesId
 		}
 	}
 
@@ -71,8 +71,8 @@ class DockerListImages extends AbstractDockerRemoteApiTask {
 			}
 		} : allImages
 	
-		imageId = images?.find {true}?.id
-
+		imagesId = images.collect {it.id} 
+	
 		responseHandler.handle(images)
 	}
 
