@@ -19,7 +19,7 @@ import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.Optional;
 
 class DockerRemoveImage extends DockerExistingImage {
-	
+
 	@Input
 	@Optional
 	Boolean force
@@ -27,20 +27,32 @@ class DockerRemoveImage extends DockerExistingImage {
 	@Input
 	@Optional
 	Boolean noPrune
-		
-    @Override
-    void runRemoteCommand(dockerClient) {
+
+	@Input
+	@Optional
+	Boolean ignoreException
+
+	@Override
+	void runRemoteCommand(dockerClient) {
 		logger.quiet "Removing image with ID '${getImageId()}'."
 		def removeImageCmd = dockerClient.removeImageCmd(getImageId())
-		
+
 		if(getForce()) {
 			removeImageCmd.withForce(getForce())
 		}
-		
+
 		if(getNoPrune()) {
 			removeImageCmd.withNoPrune(getNoPrune())
 		}
-		
-        removeImageCmd.exec()
-    }
+
+		if (getIgnoreException()) {
+			try {
+				removeImageCmd.exec()
+			} catch (Exception e) {
+				logger.quiet "Can't remove image with ID '${getImageId()}'."
+			}
+		} else {
+			removeImageCmd.exec()
+		}
+	}
 }
