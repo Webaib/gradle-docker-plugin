@@ -50,6 +50,12 @@ class DockerListContainers extends AbstractDockerRemoteApiTask {
 
 	@Optional
 	greps
+	
+	DockerListContainers() {
+		ext.getFirstId = {
+			firstId
+		}
+	}
 
 	@Override
 	void runRemoteCommand(dockerClient) {
@@ -87,7 +93,9 @@ class DockerListContainers extends AbstractDockerRemoteApiTask {
 				}.every { it == true }
 			}
 		} : allContainers
-
+	
+		firstId = containers.size() > 0 ? containers.first().id : "---"
+	
 		responseHandler.handle(containers)
 	}
 

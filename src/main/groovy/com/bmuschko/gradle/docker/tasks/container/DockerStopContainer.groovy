@@ -25,6 +25,10 @@ class DockerStopContainer extends DockerExistingContainer {
     @Input
     @Optional
     Integer timeout
+	
+	@Input
+	@Optional
+	Boolean ignoreException
 
     @Override
     void runRemoteCommand(dockerClient) {
@@ -35,6 +39,14 @@ class DockerStopContainer extends DockerExistingContainer {
             stopContainerCmd.withTimeout(getTimeout())
         }
 
-        stopContainerCmd.exec()
+		if (getIgnoreException()) {
+			try {
+				stopContainerCmd.exec()
+			} catch (Exception e) {
+				logger.quiet "Can't stop container with ID '${getContainerId()}'."
+			}
+		} else {
+			stopContainerCmd.exec()
+		}
     }
 }

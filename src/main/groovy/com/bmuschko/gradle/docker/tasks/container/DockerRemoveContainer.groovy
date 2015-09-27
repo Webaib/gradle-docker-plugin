@@ -27,9 +27,14 @@ class DockerRemoveContainer extends DockerExistingContainer {
 	@Input
 	@Optional
 	Boolean removeVolumes
+	
+	@Input
+	@Optional
+	Boolean ignoreException
 
 	@Override
 	void runRemoteCommand(dockerClient) {
+		logger.quiet "Removing container with ID '${getContainerId()}'."
 		def removeContainerCmd = dockerClient.removeContainerCmd(getContainerId())
 
 		if(getForce()) {
@@ -40,7 +45,14 @@ class DockerRemoveContainer extends DockerExistingContainer {
 			removeContainerCmd.withRemoveVolumes(getRemoveVolumes())
 		}
 
-		logger.quiet "Removing container with ID '${getContainerId()}'."
-		removeContainerCmd.exec()
+		if (getIgnoreException()) {
+			try {
+				removeContainerCmd.exec()
+			} catch (Exception e) {
+				logger.quiet "Can't remove container with ID '${getContainerId()}'."
+			}
+		} else {
+			removeContainerCmd.exec()
+		}
 	}
 }
